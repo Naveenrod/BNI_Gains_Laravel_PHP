@@ -2,59 +2,151 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Http\RedirectResponse;
+use App\Models\Profile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * Display a listing of the profiles
      */
-    public function edit(Request $request): View
+    public function index()
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        $profiles = Auth::user()->profiles()->latest()->get();
+        return view('profiles.index', compact('profiles'));
     }
 
     /**
-     * Update the user's profile information.
+     * Show the form for creating a new profile
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function create()
     {
-        $request->user()->fill($request->validated());
+        return view('profiles.create');
+    }
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+    /**
+     * Store a newly created profile
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'type' => 'required|string',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'status' => 'required|in:enabled,disabled',
+        ]);
+
+        $validated['user_id'] = Auth::id();
+
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            $validated['logo'] = $request->file('logo')->store('logos', 'public');
         }
 
-        $request->user()->save();
+        Profile::create($validated);
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return redirect()->route('dashboard')->with('success', 'Profile created successfully!');
     }
 
     /**
-     * Delete the user's account.
+     * Display the specified profile
      */
-    public function destroy(Request $request): RedirectResponse
+    public function show(Profile $profile)
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
+        $this->authorize('view', $profile);
+        return view('profiles.show', compact('profile'));
+    }
+
+    /**
+     * Show the form for editing the profile
+     */
+    public function edit(Profile $profile)
+    {
+        $this->authorize('update', $profile);
+        return view('profiles.edit', compact('profile'));
+    }
+
+    /**
+     * Update the specified profile
+     */
+    public function update(Request $request, Profile $profile)
+    {
+        $this->authorize('update', $profile);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'type' => 'required|string',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'status' => 'required|in:enabled,disabled',
         ]);
 
-        $user = $request->user();
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            // Delete old logo if exists
+            if ($profile->logo) {
+                Storage::disk('public')->delete($profile->logo);
+            }
+            $validated['logo'] = $request->file('logo')->store('logos', 'public');
+        }
 
-        Auth::logout();
+        $profile->update($validated);
 
-        $user->delete();
+        return redirect()->route('dashboard')->with('success', 'Profile updated successfully!');
+    }
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+    /**
+     * Remove the specified profile
+     */
+    public function destroy(Profile $profile)
+    {
+        $this->authorize('delete', $profile);
 
-        return Redirect::to('/');
+        // Delete logo if exists
+        if ($profile->logo) {
+            Storage::disk('public')->delete($profile->logo);
+        }
+
+        $profile->delete();
+
+        return redirect()->route('dashboard')->with('success', 'Profile deleted successfully!');
+    }
+
+    /**
+     * Show public profile
+     */
+    public function public($slug)
+    {
+        $profile = Profile::where('slug', $slug)
+            ->where('status', 'enabled')
+            ->with('bniGainsProfile')
+            ->firstOrFail();
+
+        return view('profiles.public', compact('profile'));
+    }
+
+    /**
+     * Generate PDF for profile
+     */
+    public function pdf(Profile $profile)
+    {
+        $this->authorize('view', $profile);
+
+        // You'll need to implement PDF generation logic here
+        // For now, return a simple response
+        return response()->json(['message' => 'PDF generation not implemented yet']);
+    }
+
+    /**
+     * Show QR code for profile
+     */
+    public function qrCode(Profile $profile)
+    {
+        $this->authorize('view', $profile);
+
+        // You'll need to implement QR code generation logic here
+        // For now, return a simple view
+        return view('profiles.qr-code', compact('profile'));
     }
 }

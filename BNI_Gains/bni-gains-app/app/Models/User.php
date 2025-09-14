@@ -58,6 +58,12 @@ class User extends Authenticatable
 
     public function getFullNameAttribute()
     {
-        return $this->first_name . ' ' .$this->last_name;
+        // Option 1: If you have first_name and last_name columns
+        if (isset($this->first_name) && isset($this->last_name)) {
+            return trim($this->first_name . ' ' . $this->last_name);
+        }
+        
+        // Option 2: If you only have a 'name' column
+        return $this->name;
     }
 }

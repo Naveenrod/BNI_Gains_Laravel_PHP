@@ -19,6 +19,11 @@ class Profile extends Model
         'hostname',
         'slug',
     ];
+    
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
     protected static function boot()
     {
@@ -33,6 +38,7 @@ class Profile extends Model
             }
         });
     }
+    
 
     public function user()
     {
