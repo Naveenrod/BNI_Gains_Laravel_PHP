@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class BniGainsProfile extends Model
 {
     use HasFactory;
+    protected $table = 'bni_gains_profile';
+
 
     protected $fillable = [
         'profile_id',
@@ -25,6 +27,6 @@ class BniGainsProfile extends Model
 
     public function profile()
     {
-        return $this->belongsTo(Profile::class);
+        return $this->belongsTo(Profile::class, 'profile_id');
     }
 }

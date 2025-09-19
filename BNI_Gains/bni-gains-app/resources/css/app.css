@@ -1,3 +1,61 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Dashboard Custom Styles */
+
+/* Profile card styling */
+.profile-card {
+    border-radius: 1rem;
+    transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.profile-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+/* Card header */
+.profile-card .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    font-weight: 600;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+
+/* Logo preview */
+.logo-preview {
+    max-width: 100px;
+    max-height: 100px;
+    object-fit: contain;
+    border: 1px solid #dee2e6;
+    background-color: #fff;
+    padding: 4px;
+    border-radius: 0.75rem;
+}
+
+/* Buttons inside cards */
+.profile-card .btn-group .btn {
+    font-size: 0.85rem;
+    border-radius: 0.5rem !important;
+    padding: 0.35rem 0.65rem;
+}
+
+/* Status badges */
+.profile-card .badge {
+    font-size: 0.75rem;
+    padding: 0.35em 0.6em;
+}
+
+/* Empty state */
+.text-center.py-5 i {
+    opacity: 0.6;
+}
+
+.text-center.py-5 h4 {
+    font-weight: 600;
+    margin-top: 1rem;
+}
+
+/* Dashboard heading */
+h2 i {
+    vertical-align: middle;
+    font-size: 1.4rem;
+}

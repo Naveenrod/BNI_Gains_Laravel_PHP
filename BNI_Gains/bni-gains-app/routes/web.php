@@ -1,34 +1,32 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\DashboardController;  // Add this import
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
-// Home route
 Route::get('/', function () {
     return view('welcome');
 });
 
 // Authentication routes
-require __DIR__.'/auth.php';  // Fixed __DIR__
+require __DIR__.'/auth.php';
 
-// Protected routes (require authentication)
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Dashboard - using controller instead of closure
+    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
-    // User profile management (different from business profiles)
+
+    // User profile (for account settings, not business profiles)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    
-    // Business profiles management
+
+    // Business profiles
     Route::resource('profiles', ProfileController::class);
-    
-    // Additional profile routes
+
+    // Extra profile actions
     Route::get('/profiles/{profile}/pdf', [ProfileController::class, 'pdf'])->name('profiles.pdf');
     Route::get('/profiles/{profile}/qr-code', [ProfileController::class, 'qrCode'])->name('profiles.qr-code');
+    Route::get('/profiles/public/{slug}', [ProfileController::class, 'public'])->name('profiles.public');
 });
 
-// Public routes (no authentication required)
+// Public routes
 Route::get('/public-profile/{slug}', [ProfileController::class, 'public'])->name('public.profile');

@@ -10,6 +10,8 @@ class Profile extends Model
 {
     use HasFactory;
 
+    protected $table = 'profiles';
+
     protected $fillable = [
         'user_id',
         'type',
@@ -19,7 +21,7 @@ class Profile extends Model
         'hostname',
         'slug',
     ];
-    
+
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -47,7 +49,7 @@ class Profile extends Model
 
     public function bniGainsProfile()
     {
-        return $this->hasOne(BniGainsProfile::class);
+        return $this->hasOne(BniGainsProfile::class, 'profile_id');
     }
 
     public function getPublicUrlAttribute()
