@@ -176,7 +176,7 @@
             <div class="flex items-center">
                 <!-- BNI Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}" class="bni-logo">
+                    <a href="{{ route('welcome') }}" class="bni-logo">
                         🏆 BNI GAINS
                     </a>
                 </div>
