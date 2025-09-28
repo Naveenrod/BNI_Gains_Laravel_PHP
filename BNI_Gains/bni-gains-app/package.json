@@ -6,7 +6,8 @@
         "development": "mix",
         "watch": "mix watch",
         "build": "npm run production",
-        "production": "mix --production"
+        "production": "mix --production",
+        "start": "php artisan serve --host 0.0.0.0 --port 10000"
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.2",
